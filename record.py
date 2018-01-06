@@ -20,7 +20,6 @@ def _parseLlvmIndexedCoverageJson(indexedCoverageJson):
     return coverage
 
 # Run the executable and return a Coverage object.
-# TODO(phil): make this work on linux without xcrun.
 def record(executable, argsList, verbose):
     try:
         # Use a temporary scratch directory.
@@ -39,7 +38,7 @@ def record(executable, argsList, verbose):
 
         # Create the indexed coverage file.
         indexedCoverageFile = os.path.join(tempOutputDir, "coverage.profdata")
-        command = "xcrun llvm-profdata merge -sparse " + rawCoverageFile + " -o " + indexedCoverageFile
+        command = "llvm-profdata merge -sparse " + rawCoverageFile + " -o " + indexedCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
@@ -48,7 +47,7 @@ def record(executable, argsList, verbose):
             print out
 
         # Convert the indexed coverage data into JSON.
-        command = "xcrun llvm-cov export " + executable + " -instr-profile=" + indexedCoverageFile
+        command = "llvm-cov export " + executable + " -instr-profile=" + indexedCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         indexedCoverageJson, err = proc.communicate()
         if err != "":
