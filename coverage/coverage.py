@@ -13,8 +13,9 @@ class Coverage(object):
         self._callcounts = defaultdict(int)
 
     def addCallCount(self, file, function, count):
-        if self._callcounts[(file, function)]:
-            raise ValueError("Function " + function + " in " + file + " call count was already recorded.")
+        # TODO(phil): Re-enable this check.
+        #if self._callcounts[(file, function)]:
+        #    raise ValueError("Function " + function + " in " + file + " call count was already recorded.")
         self._callcounts[(file, function)] = count
 
     def callCount(self, file, function):
