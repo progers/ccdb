@@ -63,7 +63,7 @@ def record(executable, argsList, verbose):
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
-            raise AssertionError(err)
+            print err
         if verbose:
             print out
 
