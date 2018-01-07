@@ -8,7 +8,7 @@ class TestCompare(unittest.TestCase):
 
     def testFunctionInANotB(self):
         coverageA = Coverage()
-        coverageA.addCallCount("fn", 5)
+        coverageA.addCallCount("", "fn", 5)
         coverageB = Coverage()
 
         # Compare A vs B.
@@ -23,9 +23,9 @@ class TestCompare(unittest.TestCase):
 
     def testFunctionCallCountDifference(self):
         coverageA = Coverage()
-        coverageA.addCallCount("fn", 5)
+        coverageA.addCallCount("", "fn", 5)
         coverageB = Coverage()
-        coverageB.addCallCount("fn", 3)
+        coverageB.addCallCount("", "fn", 3)
 
         # Compare A vs B.
         differences = compare.compare(coverageA, coverageB)

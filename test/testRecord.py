@@ -23,31 +23,31 @@ class TestRecord(unittest.TestCase):
                 Total functions: 3
                 Maximum function count: 4""")
         self.assertEquals(len(coverage.functions()), 3)
-        self.assertEquals(coverage.callCount("functionA"), 4)
-        self.assertEquals(coverage.callCount("functionB"), 3)
-        self.assertEquals(coverage.callCount("main"), 1)
+        self.assertEquals(coverage.callCount("", "functionA"), 4)
+        self.assertEquals(coverage.callCount("filename.cpp", "functionB"), 3)
+        self.assertEquals(coverage.callCount("", "main"), 1)
 
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
         coverage = record.record(executable, "1 6 3 9 0", False)
         self.assertEqual(len(coverage.functions()), 5)
-        self.assertEqual(coverage.callCount("_Z4swapPiii"), 3)
-        self.assertEqual(coverage.callCount("main"), 1)
-        self.assertEqual(coverage.callCount("_Z9quicksortPiii"), 7)
-        self.assertEqual(coverage.callCount("_Z4sortPii"), 1)
-        self.assertEqual(coverage.callCount("_Z9partitionPiii"), 3)
+        self.assertEqual(coverage.callCount("", "_Z4swapPiii"), 3)
+        self.assertEqual(coverage.callCount("", "main"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9quicksortPiii"), 7)
+        self.assertEqual(coverage.callCount("", "_Z4sortPii"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9partitionPiii"), 3)
 
     # Test that inline functions are printed.
     def testInlines(self):
         executable = "test/data/out/inlineFunctions"
         coverage = record.record(executable, "", False)
         self.assertEqual(len(coverage.functions()), 5)
-        self.assertEqual(coverage.callCount("main"), 1)
-        self.assertEqual(coverage.callCount("_Z1Dv"), 0)
-        self.assertEqual(coverage.callCount("_Z1Av"), 1)
-        self.assertEqual(coverage.callCount("_Z7inlineBv"), 1)
-        self.assertEqual(coverage.callCount("_Z1Cv"), 1)
+        self.assertEqual(coverage.callCount("", "main"), 1)
+        self.assertEqual(coverage.callCount("", "_Z1Dv"), 0)
+        self.assertEqual(coverage.callCount("", "_Z1Av"), 1)
+        self.assertEqual(coverage.callCount("", "_Z7inlineBv"), 1)
+        self.assertEqual(coverage.callCount("", "_Z1Cv"), 1)
 
 if __name__ == "__main__":
     unittest.main()

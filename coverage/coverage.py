@@ -9,29 +9,36 @@ import json
 class Coverage(object):
 
     def __init__(self):
-        self._functions = defaultdict(int)
+        # Map from (file, function) to call count.
+        self._callcounts = defaultdict(int)
 
-    def addCallCount(self, function, count):
-        if self._functions[function]:
-            raise ValueError("Function (" + function + ") call count was already recorded.")
-        self._functions[function] = count
+    def addCallCount(self, file, function, count):
+        if self._callcounts[(file, function)]:
+            raise ValueError("Function " + function + " in " + file + " call count was already recorded.")
+        self._callcounts[(file, function)] = count
 
-    def callCount(self, function):
-        return self._functions[function]
+    def callCount(self, file, function):
+        return self._callcounts[(file, function)]
 
+    # Return a list of all (file, function) pairs.
     def functions(self):
-        return self._functions.keys()
+        return self._callcounts.keys()
 
     def asJson(self, indent = None):
         encoded = {}
-        encoded["functions"] = self._functions
+        encoded["files"] = {}
+        for (file, function) in self._callcounts:
+            if not file in encoded["files"]:
+                encoded["files"][file] = {}
+            encoded["files"][file][function] = self._callcounts[(file, function)]
         return json.dumps(encoded, sort_keys=False, indent=indent)
 
     @staticmethod
     def fromJson(string):
         coverage = Coverage()
         decoded = json.loads(string)
-        functions = decoded["functions"]
-        for function in functions:
-            coverage.addCallCount(function, functions[function])
+        files = decoded["files"]
+        for file in files:
+            for function in files[file]:
+                coverage.addCallCount(file, function, files[file][function])
         return coverage

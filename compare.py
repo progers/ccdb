@@ -13,9 +13,9 @@ def compare(coverageA, coverageB):
     for function in coverageB.functions():
         if function not in allFunctions:
             allFunctions.append(function)
-    for function in allFunctions:
-        if coverageA.callCount(function) != coverageB.callCount(function):
-            differences.append(function + ": was called " + str(coverageA.callCount(function)) + " times, not " + str(coverageB.callCount(function)) + " times.")
+    for (file, function) in allFunctions:
+        if coverageA.callCount(file, function) != coverageB.callCount(file, function):
+            differences.append(function + ": was called " + str(coverageA.callCount(file, function)) + " times, not " + str(coverageB.callCount(file, function)) + " times.")
     return differences
 
 def main():

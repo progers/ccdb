@@ -26,13 +26,15 @@ def _parseFunctionProfData(profdata):
         #   Function count: 3
         functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
         for match in functionsRx.finditer(functionsData):
-            function = match.group("fileAndFunction")
-            # If a filename is specified, remove it.
-            filenameAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", function)
-            if filenameAndFunctionMatch:
-                function = filenameAndFunctionMatch.group("function")
             count = int(match.group("count"))
-            coverage.addCallCount(function, count)
+            fileAndFunction = match.group("fileAndFunction")
+            fileAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", fileAndFunction)
+            if fileAndFunctionMatch:
+                file = fileAndFunctionMatch.group("file")
+                function = fileAndFunctionMatch.group("function")
+                coverage.addCallCount(file, function, count)
+            else:
+                coverage.addCallCount("", fileAndFunction, count)
     return coverage
 
 # Run the executable and return a Coverage object.
