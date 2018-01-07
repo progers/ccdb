@@ -3,20 +3,36 @@
 # record.py - record code coverage.
 
 import argparse
-import json
 import os.path
+import re
 import shutil
 import subprocess
 import tempfile
 
 from coverage.coverage import Coverage
 
-def _parseLlvmIndexedCoverageJson(indexedCoverageJson):
+# Parse the function counter output of llvm-profdata show.
+# TODO(phil): Support block-level counters.
+def _parseFunctionProfData(profdata):
     coverage = Coverage()
-    decoded = json.loads(indexedCoverageJson)
-    functions = decoded["data"][0]["functions"]
-    for function in functions:
-        coverage.addCallCount(function["name"], function["count"])
+    # Strip the header ("Counters:") and footer ("Instrumentation level...").
+    functionsDataMatch = re.match(r"^Counters:\n(.+)Instrumentation\slevel.*$", profdata, re.DOTALL)
+    if functionsDataMatch:
+        functionsData = functionsDataMatch.group(1)
+        # Parse each block of function counter data. The format is roughly:
+        # optional_filename.cpp:function_name:
+        #   Hash: 0x456
+        #   Counters: 6
+        #   Function count: 3
+        functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
+        for match in functionsRx.finditer(functionsData):
+            function = match.group("fileAndFunction")
+            # If a filename is specified, remove it.
+            filenameAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", function)
+            if filenameAndFunctionMatch:
+                function = filenameAndFunctionMatch.group("function")
+            count = int(match.group("count"))
+            coverage.addCallCount(function, count)
     return coverage
 
 # Run the executable and return a Coverage object.
@@ -42,19 +58,18 @@ def record(executable, argsList, verbose):
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
-            print err
+            raise AssertionError(err)
         if verbose:
             print out
 
-        # Convert the indexed coverage data into JSON.
-        command = "llvm-cov export " + executable + " -instr-profile=" + indexedCoverageFile
+        # Dump the raw counter values for each function.
+        # TODO(phil): Support block-level counters.
+        command = "llvm-profdata show -all-functions -text " + rawCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        indexedCoverageJson, err = proc.communicate()
+        out, err = proc.communicate()
         if err != "":
             raise AssertionError(err)
-
-        # Parse the indexed coverage JSON into a Coverage object.
-        return _parseLlvmIndexedCoverageJson(indexedCoverageJson)
+        return _parseFunctionProfData(out)
     finally:
         shutil.rmtree(tempOutputDir)
 
