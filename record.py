@@ -12,6 +12,7 @@ import tempfile
 from coverage.coverage import Coverage
 
 # Parse the function counter output of llvm-profdata show.
+# Call counts of zero are omitted.
 # TODO(phil): Support block-level counters.
 def _parseFunctionProfData(profdata):
     coverage = Coverage()
@@ -27,6 +28,8 @@ def _parseFunctionProfData(profdata):
         functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
         for match in functionsRx.finditer(functionsData):
             count = int(match.group("count"))
+            if count == 0:
+                continue
             fileAndFunction = match.group("fileAndFunction")
             fileAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", fileAndFunction)
             if fileAndFunctionMatch:

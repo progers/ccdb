@@ -42,9 +42,10 @@ class TestRecord(unittest.TestCase):
     def testInlines(self):
         executable = "test/data/out/inlineFunctions"
         coverage = record.record(executable, "", False)
-        self.assertEqual(len(coverage.functions()), 5)
+        # There are 5 functions in this file but 'D' is never called and should
+        # be omitted.
+        self.assertEqual(len(coverage.functions()), 4)
         self.assertEqual(coverage.callCount("", "main"), 1)
-        self.assertEqual(coverage.callCount("", "_Z1Dv"), 0)
         self.assertEqual(coverage.callCount("", "_Z1Av"), 1)
         self.assertEqual(coverage.callCount("", "_Z7inlineBv"), 1)
         self.assertEqual(coverage.callCount("", "_Z1Cv"), 1)
