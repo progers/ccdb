@@ -53,13 +53,24 @@ class TestRecord(unittest.TestCase):
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
-        workingCoverage = record.record(executable, "1 6 3 9 0", False)
-        self.assertEqual(len(workingCoverage.functions()), 5)
-        self.assertEqual(workingCoverage.callCount("_Z4swapPiii"), 3)
-        self.assertEqual(workingCoverage.callCount("main"), 1)
-        self.assertEqual(workingCoverage.callCount("_Z9quicksortPiii"), 7)
-        self.assertEqual(workingCoverage.callCount("_Z4sortPii"), 1)
-        self.assertEqual(workingCoverage.callCount("_Z9partitionPiii"), 3)
+        coverage = record.record(executable, "1 6 3 9 0", False)
+        self.assertEqual(len(coverage.functions()), 5)
+        self.assertEqual(coverage.callCount("_Z4swapPiii"), 3)
+        self.assertEqual(coverage.callCount("main"), 1)
+        self.assertEqual(coverage.callCount("_Z9quicksortPiii"), 7)
+        self.assertEqual(coverage.callCount("_Z4sortPii"), 1)
+        self.assertEqual(coverage.callCount("_Z9partitionPiii"), 3)
+
+    # Test that inline functions are printed.
+    def testInlines(self):
+        executable = "test/data/out/inlineFunctions"
+        coverage = record.record(executable, "", False)
+        self.assertEqual(len(coverage.functions()), 5)
+        self.assertEqual(coverage.callCount("main"), 1)
+        self.assertEqual(coverage.callCount("_Z1Dv"), 0)
+        self.assertEqual(coverage.callCount("_Z1Av"), 1)
+        self.assertEqual(coverage.callCount("_Z7inlineBv"), 1)
+        self.assertEqual(coverage.callCount("_Z1Cv"), 1)
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,5 +11,6 @@ __pycache__/
 
 # Binaries
 examples/brokenQuicksort/brokenQuicksort
+test/data/out/*
 
 .DS_Store
