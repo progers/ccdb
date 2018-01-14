@@ -12,9 +12,9 @@ import tempfile
 from coverage.coverage import Coverage
 
 # Parse the function counter output of llvm-profdata show.
-# Call counts of zero are omitted.
-# TODO(phil): Support block-level counters.
-def _parseFunctionProfData(profdata):
+# Call counts of zero are omitted which makes the coverage data smaller.
+# TODO(phil): Support block or region counters instead of just function-level counters.
+def _parseNonZeroFunctionProfData(profdata):
     coverage = Coverage()
     # Strip the header ("Counters:") and footer ("Instrumentation level...").
     functionsDataMatch = re.match(r"^Counters:\n(.+)Instrumentation\slevel.*$", profdata, re.DOTALL)
@@ -47,6 +47,8 @@ def record(executable, argsList, verbose):
         tempOutputDir = tempfile.mkdtemp()
 
         # Run the executable and generate a raw coverage file.
+        # TODO(phil): Print an error if the executable was not built with coverage.
+        # See: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program
         rawCoverageFile = os.path.join(tempOutputDir, "coverage.profraw")
         args = "" if not argsList else " " + " ".join(argsList)
         command = "LLVM_PROFILE_FILE=\"" + rawCoverageFile + "\" " + executable + args
@@ -58,6 +60,7 @@ def record(executable, argsList, verbose):
             print out
 
         # Create the indexed coverage file.
+        # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-merge
         indexedCoverageFile = os.path.join(tempOutputDir, "coverage.profdata")
         command = "llvm-profdata merge -sparse " + rawCoverageFile + " -o " + indexedCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -68,13 +71,14 @@ def record(executable, argsList, verbose):
             print out
 
         # Dump the raw counter values for each function.
-        # TODO(phil): Support block-level counters.
+        # TODO(phil): Support block or region counters instead of just function-level counters.
+        # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-show
         command = "llvm-profdata show -all-functions -text " + rawCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
             raise AssertionError(err)
-        return _parseFunctionProfData(out)
+        return _parseNonZeroFunctionProfData(out)
     finally:
         shutil.rmtree(tempOutputDir)
 

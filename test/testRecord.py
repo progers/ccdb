@@ -5,7 +5,7 @@ import record
 class TestRecord(unittest.TestCase):
 
     def testProfDataParsing(self):
-        coverage = record._parseFunctionProfData("""Counters:
+        coverage = record._parseNonZeroFunctionProfData("""Counters:
                   functionA:
                     Hash: 0x123
                     Counters: 1
