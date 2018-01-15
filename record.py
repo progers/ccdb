@@ -86,9 +86,14 @@ def main():
     parser = argparse.ArgumentParser(description="Record code coverage")
     parser.add_argument("executable", help="Executable to run (any additional arguments are forwarded to this executable)")
     parser.add_argument("-o", "--output", help="Output code coverage file")
+    parser.add_argument("-d", "--demangler", help="Demangler")
     args, leftoverArgs = parser.parse_known_args()
 
     coverage = record(args.executable, leftoverArgs, True)
+
+    if args.demangler:
+        coverage.demangle(args.demangler)
+
     if args.output:
         with open (args.output, 'w') as outFile:
             outFile.write(coverage.asJson())
