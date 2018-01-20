@@ -42,6 +42,13 @@ def _parseNonZeroFunctionProfData(profdata):
 
 # Run the executable and return a Coverage object.
 def record(executable, argsList, verbose):
+    # Check the executable to ensure it was built with coverage.
+    with open (executable, 'r') as inFile:
+        executableData = inFile.read()
+    # Count the instances of __llvm_profile. A simple hello world has 34.
+    if executableData.count("__llvm_profile") < 10:
+        raise AssertionError("No coverage data found in executable. Ensure the \"-fprofile-instr-generate -fcoverage-mapping\" build flags are used.")
+
     try:
         # Use a temporary scratch directory.
         tempOutputDir = tempfile.mkdtemp()

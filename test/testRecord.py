@@ -50,5 +50,10 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(coverage.callCount("", "_Z7inlineBv"), 1)
         self.assertEqual(coverage.callCount("", "_Z1Cv"), 1)
 
+    # Ensure an error is thrown if there is no coverage data in the binary.
+    def testNoCoverageError(self):
+        executable = "test/data/out/noCoverage"
+        self.assertRaises(AssertionError, record.record, executable, "", False)
+
 if __name__ == "__main__":
     unittest.main()
