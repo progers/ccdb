@@ -34,7 +34,8 @@ def compare(coverageA, coverageB):
         if aCallCount != bCallCount:
             file = allFunctionsMap[key]["file"]
             function = allFunctionsMap[key]["function"]
-            differences.append(file + function + " call count difference: " + str(aCallCount) + " != " + str(bCallCount))
+            fileAndFunction = (file + ": " if file else "") + function
+            differences.append(fileAndFunction + " call count difference: " + str(aCallCount) + " != " + str(bCallCount))
     return differences
 
 def main():

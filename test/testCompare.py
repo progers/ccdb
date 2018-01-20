@@ -37,6 +37,18 @@ class TestCompare(unittest.TestCase):
         self.assertEqual(len(differences), 1)
         self.assertEqual(differences[0], "fn call count difference: 3 != 5")
 
+    # Test a difference where functions with the same name are covered but the functions are different because they are in different files.
+    def testDifferenceWithFiles(self):
+        coverageA = Coverage()
+        coverageA.addCallCount("a.cpp", "fn", 4)
+        coverageB = Coverage()
+        coverageB.addCallCount("b.cpp", "fn", 4)
+
+        differences = compare.compare(coverageA, coverageB)
+        self.assertEqual(len(differences), 2)
+        self.assertEqual(differences[0], "b.cpp: fn call count difference: 0 != 4")
+        self.assertEqual(differences[1], "a.cpp: fn call count difference: 4 != 0")
+
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
