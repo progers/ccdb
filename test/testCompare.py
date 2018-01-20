@@ -49,6 +49,27 @@ class TestCompare(unittest.TestCase):
         self.assertEqual(differences[0], "b.cpp: fn call count difference: 0 != 4")
         self.assertEqual(differences[1], "a.cpp: fn call count difference: 4 != 0")
 
+    def testDifferenceSortOrder(self):
+        coverageA = Coverage()
+        coverageA.addCallCount("", "a", 5)
+        coverageA.addCallCount("", "b", 4)
+        coverageA.addCallCount("", "c", 6)
+        coverageB = Coverage()
+
+        # Compare A vs B, call count differences should be ascending.
+        differences = compare.compare(coverageA, coverageB)
+        self.assertEqual(len(differences), 3)
+        self.assertEqual(differences[0], "b call count difference: 4 != 0")
+        self.assertEqual(differences[1], "a call count difference: 5 != 0")
+        self.assertEqual(differences[2], "c call count difference: 6 != 0")
+
+        # Compare B vs A, call count differences should be ascending.
+        differences = compare.compare(coverageB, coverageA)
+        self.assertEqual(len(differences), 3)
+        self.assertEqual(differences[0], "b call count difference: 0 != 4")
+        self.assertEqual(differences[1], "a call count difference: 0 != 5")
+        self.assertEqual(differences[2], "c call count difference: 0 != 6")
+
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
