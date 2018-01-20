@@ -54,7 +54,6 @@ def record(executable, argsList, verbose):
         tempOutputDir = tempfile.mkdtemp()
 
         # Run the executable and generate a raw coverage file.
-        # TODO(phil): Print an error if the executable was not built with coverage.
         # See: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program
         rawCoverageFile = os.path.join(tempOutputDir, "coverage.profraw")
         args = "" if not argsList else " " + " ".join(argsList)
