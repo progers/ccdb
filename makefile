@@ -17,5 +17,5 @@ tests: examples/brokenQuicksort/brokenQuicksort test/data/out/inlineFunctions te
 	python -m unittest discover
 
 clean:
-	rm examples/brokenQuicksort/brokenQuicksort test/data/out/inlineFunctions test/data/out/noCoverage
+	rm -f examples/brokenQuicksort/brokenQuicksort test/data/out/inlineFunctions test/data/out/noCoverage
 
