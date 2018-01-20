@@ -41,7 +41,15 @@ def _parseNonZeroFunctionProfData(profdata):
     return coverage
 
 # Run the executable and return a Coverage object.
-def record(executable, argsList, verbose):
+def record(llvmToolchainPath, executable, argsList, verbose):
+    # Ensure llvm-profdata is available.
+    llvmProfdata = os.path.join(llvmToolchainPath, "llvm-profdata")
+    command = llvmProfdata + " show --help"
+    proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    out, err = proc.communicate()
+    if err != "":
+        raise AssertionError(err)
+
     # Check the executable to ensure it was built with coverage.
     with open (executable, 'r') as inFile:
         executableData = inFile.read()
@@ -68,7 +76,7 @@ def record(executable, argsList, verbose):
         # Create the indexed coverage file.
         # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-merge
         indexedCoverageFile = os.path.join(tempOutputDir, "coverage.profdata")
-        command = "llvm-profdata merge -sparse " + rawCoverageFile + " -o " + indexedCoverageFile
+        command = llvmProfdata + " merge -sparse " + rawCoverageFile + " -o " + indexedCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
@@ -79,7 +87,7 @@ def record(executable, argsList, verbose):
         # Dump the raw counter values for each function.
         # TODO(phil): Support block or region counters instead of just function-level counters.
         # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-show
-        command = "llvm-profdata show -all-functions -text " + rawCoverageFile
+        command = llvmProfdata + " show -all-functions -text " + rawCoverageFile
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
@@ -93,9 +101,10 @@ def main():
     parser.add_argument("executable", help="Executable to run (any additional arguments are forwarded to this executable)")
     parser.add_argument("-o", "--output", help="Output code coverage file")
     parser.add_argument("-d", "--demangler", help="Demangler")
+    parser.add_argument("-p", "--llvm-toolchain", help="Location of LLVM toolchain which should include llvm-profdata", default="")
     args, leftoverArgs = parser.parse_known_args()
 
-    coverage = record(args.executable, leftoverArgs, True)
+    coverage = record(args.llvm_toolchain, args.executable, leftoverArgs, True)
 
     if args.demangler:
         coverage.demangle(args.demangler)
