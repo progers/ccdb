@@ -41,7 +41,7 @@ class TestRecord(unittest.TestCase):
     # Test that inline functions are printed.
     def testInlines(self):
         executable = "test/data/out/inlineFunctions"
-        coverage = record.record(executable, "")
+        coverage = record.record(executable)
         # There are 5 functions in this file but 'D' is never called and should
         # be omitted.
         self.assertEqual(len(coverage.functions()), 4)
@@ -53,7 +53,7 @@ class TestRecord(unittest.TestCase):
     # Ensure an error is thrown if there is no coverage data in the binary.
     def testNoCoverageError(self):
         executable = "test/data/out/noCoverage"
-        self.assertRaises(AssertionError, record.record, executable, "")
+        self.assertRaises(AssertionError, record.record, executable)
 
 if __name__ == "__main__":
     unittest.main()

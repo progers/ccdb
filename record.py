@@ -37,7 +37,7 @@ def _parseNonZeroFunctionProfData(profdata):
     return coverage
 
 # Run the executable and return a Coverage object.
-def record(executable, argsList, llvmToolchainPath = None, verbose = False):
+def record(executable, args = None, llvmToolchainPath = None, verbose = False):
     # Ensure llvm-profdata is available.
     llvmProfdata = os.path.join(llvmToolchainPath, "llvm-profdata") if llvmToolchainPath else "llvm-profdata"
     command = llvmProfdata + " show --help"
@@ -60,8 +60,7 @@ def record(executable, argsList, llvmToolchainPath = None, verbose = False):
         # Run the executable and generate a raw coverage file.
         # See: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program
         rawCoverageFile = os.path.join(tempOutputDir, "coverage.profraw")
-        args = "" if not argsList else " " + " ".join(argsList)
-        command = "LLVM_PROFILE_FILE=\"" + rawCoverageFile + "\" " + executable + args
+        command = "LLVM_PROFILE_FILE=\"" + rawCoverageFile + "\" " + executable + (" " + args if args else "")
         proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
@@ -100,7 +99,7 @@ def main():
     parser.add_argument("-p", "--llvm-toolchain", help="Location of LLVM toolchain which should include llvm-profdata", default="")
     args, leftoverArgs = parser.parse_known_args()
 
-    coverage = record(args.executable, leftoverArgs, llvmToolchainPath = args.llvm_toolchain, verbose = True)
+    coverage = record(args.executable, args = " ".join(leftoverArgs), llvmToolchainPath = args.llvm_toolchain, verbose = True)
 
     if args.demangler:
         coverage.demangle(args.demangler)
