@@ -108,6 +108,12 @@ def main():
 
     if args.demangler:
         coverage.demangle(args.demangler)
+    else:
+        # Try demangling using c++filt but fail silently.
+        try:
+            coverage.demangle("c++filt")
+        except:
+            pass
 
     if args.output:
         with open (args.output, 'w') as outFile:
