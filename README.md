@@ -11,30 +11,47 @@ This technique is useful for large software projects where passing and failing t
 Tutorial
 ---------
 
-The first step is to build the program with Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html) by passing `-g`, `-fprofile-instr-generate`, and `-fcoverage-mapping` to clang++:
+The first step is to ensure `clang++` and `llvm-profdata` are available on the PATH.
+```
+> which clang++
+path/to/clang++
+
+> which llvm-profdata
+path/to/llvm-profdata
+```
+
+If these are not available on linux, release binaries can be downloaded from [llvm.org](http://releases.llvm.org/download.html) and added to the PATH with `PATH=$PATH:path/to/llvm/bin`.
+
+If these are not available on MacOS, they can be downloaded by installing the XCode command line tools. The following command can be used to put the current toolchain binaries on the PATH:
+```
+PATH=$PATH:`xcrun -f llvm-profdata | xargs dirname`
+```
+
+
+Then, build the program with Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html) by passing `-g`, `-fprofile-instr-generate`, and `-fcoverage-mapping` to clang++:
 ```
 clang++ -g -fprofile-instr-generate -fcoverage-mapping program.cpp -o program
 ```
 
 Then record code coverage when running the program which will output a coverage file (`good.json`):
 ```
-> python record.py -o good.json ./program good_args
+python record.py -o good.json ./program good_args
 ```
 
 The coverage file has a simple format where function call counts are recorded:
 ```
-python -m json.tool good.json
+> python -m json.tool good.json
 {
     "main": 1,
     "functionA(...)": 1,
     "functionB(...)": 3
 }
 ```
-`main` and `functionA(...)` were called once, whereas `functionB(...)` was called 3 times.
+In this example, `main` and `functionA(...)` were called once, whereas `functionB(...)` was called 3 times.
 
 Now record code coverage again but on a run of the program that contains a bug:
 ```
-> python record.py -o bug.json ./program bad_args
+python record.py -o bug.json ./program bad_args
 ```
 
 Finally, compare the two runs:
