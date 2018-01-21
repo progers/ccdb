@@ -7,8 +7,7 @@ This example walks through a real-world bug using code coverage debugging.
 
 Building with coverage
 --------
-Special flags need to be passed to the compiler and linker to enable LLVM code coverage.
-This can be done by editing the gn args:
+Special flags need to be passed to the compiler and linker to enable Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html). This can be done by editing the gn args:
 
 ```
 gn args out/Coverage
@@ -22,7 +21,7 @@ use_clang_coverage=true
 use_goma=true
 ```
 
-Ensure gclient is up-to-date and build with coverage enabled:
+Ensure gclient is up-to-date, then build with coverage enabled:
 ```
 gclient runhooks
 ninja -C out/Coverage content_shell
@@ -32,16 +31,32 @@ Get llvm-profdata
 --------
 `llvm-profdata` will be used to analyze coverage, and the version needs to match the compiler.
 
-Ensure llvm-profdata exists by running:
+Add both clang++ and llvm-profdata to the PATH using:
 ```
 CHROMIUM_SRC=~/Desktop/chromium/src
-${CHROMIUN_SRC}/src/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
+PATH=$PATH:${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
 ```
 
-If `llvm-profdata` does not exist, it can be downloaded. As part of [crbug.com/759794](https://crbug.com/759794), `llvm-profdata` will be downloaded automatically but, for now, this is manual.
+Ensure `clang++` and `llvm-profdata` are available on the PATH:
+```
+> which clang++
+should print CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/clang++
+
+> which llvm-profdata
+should print CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
+```
+
+If `llvm-profdata` is not available, a version matching `clang++` can be downloaded. As part of [crbug.com/759794](https://crbug.com/759794), `llvm-profdata` will be downloaded automatically but, for now, this is manual.
 An existing tool, [`coverage.py`](https://cs.chromium.org/chromium/src/tools/code_coverage/coverage.py), downloads the correct version of `llvm-profdata` and can be abused into just downloading it. Running the following command will fail with an error but should result in `llvm-profdata` being downloaded:
 ```
-${CHROMIUN_SRC}/tools/code_coverage/coverage.py content_shell -b out/Coverage -c out/Coverage/content_shell -o /tmp/foo
+> cd $CHROMIUM_SRC
+> tools/code_coverage/coverage.py does_not_exist -b out/Coverage -c out/Coverage/does_not_exist -o /tmp/foo
+
+Downloading https://commondatastorage.googleapis.com/...llvm-code-coverage .......... Done.
+Coverage tools unpacked
+Building ['does_not_exist']
+ninja: Entering directory `out/Coverage'
+ninja: error: unknown target 'does_not_exist'
 ```
 
 Narrowing in on the bug
@@ -49,15 +64,14 @@ Narrowing in on the bug
 
 `record.py` can be used to record the call counts of all function calls. Use it to record runs for `bug.html` and `nobug.html`:
 ```
-CHROMIUM_SRC=~/Desktop/chromium/src
-python record.py --llvm-toolchain=${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin/ --demangler="c++filt" ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process examples/chromiumArithmeticBug/bug.html -o bug.json
-python record.py --llvm-toolchain=${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin/ --demangler="c++filt" ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process examples/chromiumArithmeticBug/nobug.html -o nobug.json
+> cd examples/chromiumArithmeticBug
+> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process bug.html -o bug.json
+> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process nobug.html -o nobug.json
 ```
 
-Then use the `compare.py` script to analyze the differences.
-
+Then use `compare.py` to analyze the differences.
 ```
-> python compare.py nobug.json bug.json | grep ^blink::Layout
+> python ../../compare.py nobug.json bug.json | grep ^blink::Layout
 
 blink::LayoutObject::NeedsSimplifiedNormalFlowLayout() const call count difference: 30 != 29
 blink::LayoutBlockFlow::MarginValues::SetNegativeMarginBefore(...) call count difference: 2 != 1

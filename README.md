@@ -56,7 +56,7 @@ python record.py -o bug.json ./program bad_args
 
 Finally, compare the two runs:
 ```
-> ./compare.py good.json bug.json
+python compare.py good.json bug.json
 
 functionB(...) call count difference: 3 != 0
 ```
