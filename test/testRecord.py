@@ -30,7 +30,7 @@ class TestRecord(unittest.TestCase):
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
-        coverage = record.record("", executable, "1 6 3 9 0", False)
+        coverage = record.record(executable, "1 6 3 9 0")
         self.assertEqual(len(coverage.functions()), 5)
         self.assertEqual(coverage.callCount("", "_Z4swapPiii"), 3)
         self.assertEqual(coverage.callCount("", "main"), 1)
@@ -41,7 +41,7 @@ class TestRecord(unittest.TestCase):
     # Test that inline functions are printed.
     def testInlines(self):
         executable = "test/data/out/inlineFunctions"
-        coverage = record.record("", executable, "", False)
+        coverage = record.record(executable, "")
         # There are 5 functions in this file but 'D' is never called and should
         # be omitted.
         self.assertEqual(len(coverage.functions()), 4)
@@ -53,7 +53,7 @@ class TestRecord(unittest.TestCase):
     # Ensure an error is thrown if there is no coverage data in the binary.
     def testNoCoverageError(self):
         executable = "test/data/out/noCoverage"
-        self.assertRaises(AssertionError, record.record, "", executable, "", False)
+        self.assertRaises(AssertionError, record.record, executable, "")
 
 if __name__ == "__main__":
     unittest.main()

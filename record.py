@@ -37,9 +37,9 @@ def _parseNonZeroFunctionProfData(profdata):
     return coverage
 
 # Run the executable and return a Coverage object.
-def record(llvmToolchainPath, executable, argsList, verbose):
+def record(executable, argsList, llvmToolchainPath = None, verbose = False):
     # Ensure llvm-profdata is available.
-    llvmProfdata = os.path.join(llvmToolchainPath, "llvm-profdata")
+    llvmProfdata = os.path.join(llvmToolchainPath, "llvm-profdata") if llvmToolchainPath else "llvm-profdata"
     command = llvmProfdata + " show --help"
     proc = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = proc.communicate()
@@ -100,7 +100,7 @@ def main():
     parser.add_argument("-p", "--llvm-toolchain", help="Location of LLVM toolchain which should include llvm-profdata", default="")
     args, leftoverArgs = parser.parse_known_args()
 
-    coverage = record(args.llvm_toolchain, args.executable, leftoverArgs, True)
+    coverage = record(args.executable, leftoverArgs, llvmToolchainPath = args.llvm_toolchain, verbose = True)
 
     if args.demangler:
         coverage.demangle(args.demangler)
