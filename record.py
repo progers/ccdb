@@ -16,28 +16,24 @@ from coverage.coverage import Coverage
 # TODO(phil): Support block or region counters instead of just function-level counters.
 def _parseNonZeroFunctionProfData(profdata):
     coverage = Coverage()
-    # Strip the header ("Counters:") and footer ("Instrumentation level...").
-    functionsDataMatch = re.match(r"^Counters:\n(.+)Instrumentation\slevel.*$", profdata, re.DOTALL)
-    if functionsDataMatch:
-        functionsData = functionsDataMatch.group(1)
-        # Parse each block of function counter data. The format is roughly:
-        # optional_filename.cpp:function_name:
-        #   Hash: 0x456
-        #   Counters: 6
-        #   Function count: 3
-        functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
-        for match in functionsRx.finditer(functionsData):
-            count = int(match.group("count"))
-            if count == 0:
-                continue
-            fileAndFunction = match.group("fileAndFunction")
-            fileAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", fileAndFunction)
-            if fileAndFunctionMatch:
-                file = fileAndFunctionMatch.group("file")
-                function = fileAndFunctionMatch.group("function")
-                coverage.addCallCount(file, function, count)
-            else:
-                coverage.addCallCount("", fileAndFunction, count)
+    # Parse each block of function counter data. The format is roughly:
+    #   optional_filename.cpp:function_name:
+    #     Hash: 0x456
+    #     Counters: 6
+    #     Function count: 3
+    functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
+    for match in functionsRx.finditer(profdata):
+        count = int(match.group("count"))
+        if count == 0:
+            continue
+        fileAndFunction = match.group("fileAndFunction")
+        fileAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", fileAndFunction)
+        if fileAndFunctionMatch:
+            file = fileAndFunctionMatch.group("file")
+            function = fileAndFunctionMatch.group("function")
+            coverage.addCallCount(file, function, count)
+        else:
+            coverage.addCallCount("", fileAndFunction, count)
     return coverage
 
 # Run the executable and return a Coverage object.
