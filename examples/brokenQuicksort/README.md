@@ -3,10 +3,8 @@ Find a brokenQuicksort bug with code coverage
 
 It took years to write the advanced brokenQuicksort program. Days before shipping, a bug was discovered and assigned to you, the new person. You don't know enough about this complex code to know where to start. This tutorial will use code coverage debugging to find the bug.
 
-Building
---------
-
-Ensure `clang++` and `llvm-profdata` are available on the PATH. If they are not, see the first step in the main [README.md](../../README.md).
+## Building
+Ensure `clang++` and `llvm-profdata` are available on the PATH. If they are not, see [Prerequisites](../../README.md#prerequisites).
 ```
 > which clang++
 path/to/clang++
@@ -21,8 +19,7 @@ clang++ -g -fno-inline -fprofile-instr-generate -fcoverage-mapping brokenQuickso
 ```
 
 
-The bug
----------
+## The bug
 All you know is that there's a bug with certain input:
 ```
 > ./brokenQuicksort 1 6 3 9 0
@@ -31,9 +28,7 @@ All you know is that there's a bug with certain input:
     0 1 9 6 5 // This is not sorted
 ```
 
-Using code coverage debugging
---------
-
+## Using code coverage debugging
 Begin by recording coverage for a working run of the program:
 ```
 python ../../record.py -o working.json ./brokenQuicksort 1 6 3 9 0

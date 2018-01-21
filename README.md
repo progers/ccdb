@@ -8,25 +8,9 @@ Code coverage debugging is technique where every function call is recorded for t
 This technique is useful for large software projects where passing and failing testcases are available but it's not obvious where to start debugging. Many bugs in Chromium end up being trivial one-line fixes where an engineer spends hours finding the bug but only a few minutes fixing it. Code coverage debugging can save time by methodologically narrowing in on suspect code.
 
 
-Tutorial
----------
+## Tutorial
 
-The first step is to ensure `clang++` and `llvm-profdata` are available on the PATH.
-```
-> which clang++
-path/to/clang++
-
-> which llvm-profdata
-path/to/llvm-profdata
-```
-
-If these are not available on linux, release binaries can be downloaded from [llvm.org](http://releases.llvm.org/download.html) and added to the PATH with `PATH=$PATH:path/to/llvm/bin`.
-
-If these are not available on MacOS, they can be downloaded by installing the XCode command line tools. The following command can be used to put the current toolchain binaries on the PATH:
-```
-PATH=$PATH:`xcrun -f llvm-profdata | xargs dirname`
-```
-
+First, ensure `clang++` and `llvm-profdata` are available. See the [Prerequisites](#prerequisites) section, below.
 
 Then, build the program with Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html) by passing `-g`, `-fprofile-instr-generate`, and `-fcoverage-mapping` to clang++:
 ```
@@ -62,3 +46,22 @@ functionB(...) call count difference: 3 != 0
 ```
 
 The good input called `functionB(...)` but the bad input didn't, so there is likey a bug where `functionB(...)` is not getting called.
+
+
+## Prerequisites
+
+`clang++` and `llvm-profdata` need to be available on the PATH.
+```
+> which clang++
+path/to/clang++
+
+> which llvm-profdata
+path/to/llvm-profdata
+```
+
+If these are not available on linux, release binaries can be downloaded from [llvm.org](http://releases.llvm.org/download.html) and added to the PATH with `PATH=$PATH:path/to/llvm/bin`.
+
+If these are not available on MacOS, they can be downloaded by installing the XCode command line tools. Then run the following command to put the toolchain binaries on the PATH:
+```
+PATH=$PATH:`xcrun -f llvm-profdata | xargs dirname`
+```

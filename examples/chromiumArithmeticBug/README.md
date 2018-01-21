@@ -5,8 +5,7 @@ Finding a bug in Chromium (Blink) with code coverage
 
 This example walks through a real-world bug using code coverage debugging.
 
-Building with coverage
---------
+## Build with coverage
 Special flags need to be passed to the compiler and linker to enable Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html). This can be done by editing the gn args:
 
 ```
@@ -27,21 +26,17 @@ gclient runhooks
 ninja -C out/Coverage content_shell
 ```
 
-Get llvm-profdata
---------
+## Get llvm-profdata
 `llvm-profdata` will be used to analyze coverage, and the version needs to match the compiler.
 
-Add both clang++ and llvm-profdata to the PATH using:
+Add `llvm-profdata` to the PATH using:
 ```
 CHROMIUM_SRC=~/Desktop/chromium/src
-PATH=$PATH:${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
+PATH=$PATH:${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin
 ```
 
-Ensure `clang++` and `llvm-profdata` are available on the PATH:
+Ensure `llvm-profdata` is available on the PATH:
 ```
-> which clang++
-should print CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/clang++
-
 > which llvm-profdata
 should print CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
 ```
@@ -59,9 +54,7 @@ ninja: Entering directory `out/Coverage'
 ninja: error: unknown target 'does_not_exist'
 ```
 
-Narrowing in on the bug
---------
-
+## Narrowing in on the bug
 `record.py` can be used to record the call counts of all function calls. Use it to record runs for `bug.html` and `nobug.html`:
 ```
 > cd examples/chromiumArithmeticBug
@@ -83,9 +76,7 @@ blink::LayoutBlockFlow::AddIntrudingFloats(...) call count difference: 0 != 1
 
 Somehow `LayoutBlockFlow::AddIntrudingFloats()` is called for `bug.html` but not `nobug.html`.
 
-Fixing the bug
---------
-
+## Fixing the bug
 Looking at [LayoutBlockFlow.cpp](https://cs.chromium.org/chromium/src/third_party/WebKit/Source/core/layout/LayoutBlockFlow.cpp), `AddIntrudingFloats` is only getting called when the bug is present.
 
 ```
@@ -114,6 +105,5 @@ Chromium uses fixed-point units (`LayoutUnit`) with [saturated arithmetic](https
 
 The fix for this bug landed in [6c961fe1112914b9d63d6551e31b96c415dfb83f](https://crrev.com/6c961fe1112914b9d63d6551e31b96c415dfb83f) and simply re-ordered the operations to avoid a saturated arithmetic bug.
 
-Wrapup
---------
+## Wrapup
 This is a real example where locating the root-cause of a bug is time consuming: it took roughly 12 hours for an experienced engineer. Looking through the output of `compare.py` can take a little while but is a straightforward task. For this bug, code coverage debugging would have saved over a day of debugging!
