@@ -106,8 +106,10 @@ def main():
         coverage.demangle(args.demangler)
     else:
         # Try demangling using c++filt but fail silently.
+        # MacOS's c++filt version is older and strips underscores by default, which is different from the latest GNU C++filt.
+        # Work around this difference by forcing underscores to not be stripped using -n.
         try:
-            coverage.demangle("c++filt")
+            coverage.demangle("c++filt -n")
         except:
             pass
 
