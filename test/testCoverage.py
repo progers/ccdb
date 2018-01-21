@@ -32,7 +32,7 @@ class TestCoverage(unittest.TestCase):
     def testDemangling(self):
         coverage = Coverage()
         # Demangling empty coverage should not assert.
-        coverage.demangle("c++filt")
+        coverage.demangle("c++filt -n")
 
         # Demangling with no demangler should assert.
         self.assertRaises(AssertionError, coverage.demangle, "c--filt")
@@ -41,7 +41,7 @@ class TestCoverage(unittest.TestCase):
         coverage.addCallCount("", "_Z8MangledBv", 3)
         coverage.addCallCount("", "NotMangledAbc", 1)
         self.assertEqual(len(coverage.functions()), 3)
-        coverage.demangle("c++filt")
+        coverage.demangle("c++filt -n")
         self.assertEqual(len(coverage.functions()), 3)
         self.assertEqual(coverage.callCount("", "MangledA()"), 1)
         self.assertEqual(coverage.callCount("", "MangledB()"), 3)
