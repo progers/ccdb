@@ -55,5 +55,15 @@ class TestRecord(unittest.TestCase):
         executable = "test/data/out/noCoverage"
         self.assertRaises(AssertionError, record.record, executable)
 
+    # Integration test using the filtered coverage executable. Only filtered
+    # functions should be in the recording.
+    def testFiltering(self):
+        executable = "test/data/out/filteredCoverage"
+        coverage = record.record(executable)
+        self.assertEqual(len(coverage.functions()), 3)
+        self.assertEqual(coverage.callCount("", "_Z9functionBv"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9functionCv"), 1)
+        self.assertEqual(coverage.callCount("", "_ZN19FilterCoverageScopeD2Ev"), 1)
+
 if __name__ == "__main__":
     unittest.main()
