@@ -64,7 +64,7 @@ static void beginFilteringCoverage(BeforeFilteringData* beforeData = nullptr) {
   // Change the profile file to the filtered file. This should only be necessary
   // if the profile file was changed. This is done when starting filtering in
   // case the program exits before filtering is ended.
-  auto profileFile = FilterCoverage::coverageProfileOutputFilename();
+  std::basic_string<char> profileFile = coverageProfileOutputFilename();
   __llvm_profile_set_filename(profileFile.c_str());
 
   // Reset the coverage counters to 0.
@@ -79,9 +79,9 @@ static void endFilteringCoverage(const BeforeFilteringData* beforeData = nullptr
 
   // Change the profile file to [*.profraw]_unfiltered so any remaining coverage
   // will get written to a different file.
-  auto unfilteredProfileFile = FilterCoverage::coverageProfileOutputFilename();
-  unfilteredProfileFile.append("_unfiltered");
-  __llvm_profile_set_filename(unfilteredProfileFile.c_str());
+  std::basic_string<char> profileFile = coverageProfileOutputFilename();
+  profileFile.append("_unfiltered");
+  __llvm_profile_set_filename(profileFile.c_str());
 
   if (beforeData) {
     // Restore the coverage before filtering.
