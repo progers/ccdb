@@ -60,10 +60,11 @@ class TestRecord(unittest.TestCase):
     def testFiltering(self):
         executable = "test/data/out/filteredCoverage"
         coverage = record.record(executable)
-        self.assertEqual(len(coverage.functions()), 3)
+        # Only functions B and C should have coverage.
+        self.assertEqual(coverage.callCount("", "_Z9functionAv"), 0)
         self.assertEqual(coverage.callCount("", "_Z9functionBv"), 1)
         self.assertEqual(coverage.callCount("", "_Z9functionCv"), 1)
-        self.assertEqual(coverage.callCount("filteredCoverage.cpp", "_ZN14FilterCoverageL20endFilteringCoverageEPKNS_19BeforeFilteringDataE"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9functionDv"), 0)
 
 if __name__ == "__main__":
     unittest.main()
