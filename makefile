@@ -9,9 +9,9 @@ test/data/out/inlineFunctions: test/data/inlineFunctions.cpp
 	mkdir -p test/data/out
 	clang++ -g -fno-inline -fprofile-instr-generate -fcoverage-mapping test/data/inlineFunctions.cpp -o test/data/out/inlineFunctions
 
-test/data/out/filteredCoverage: test/data/filteredCoverage.cpp
+test/data/out/filteredCoverage: test/data/filteredCoverage.cpp FilterCoverage.h
 	mkdir -p test/data/out
-	clang++ -g -fno-inline -fprofile-instr-generate -fcoverage-mapping FilterCoverage.cpp test/data/filteredCoverage.cpp -o test/data/out/filteredCoverage
+	clang++ -g -fno-inline -fprofile-instr-generate -fcoverage-mapping test/data/filteredCoverage.cpp -o test/data/out/filteredCoverage
 
 test/data/out/noCoverage: test/data/inlineFunctions.cpp
 	mkdir -p test/data/out

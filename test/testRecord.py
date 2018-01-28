@@ -63,7 +63,7 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(len(coverage.functions()), 3)
         self.assertEqual(coverage.callCount("", "_Z9functionBv"), 1)
         self.assertEqual(coverage.callCount("", "_Z9functionCv"), 1)
-        self.assertEqual(coverage.callCount("", "_ZN19FilterCoverageScopeD2Ev"), 1)
+        self.assertEqual(coverage.callCount("filteredCoverage.cpp", "_ZN14FilterCoverageL20endFilteringCoverageEPKNS_19BeforeFilteringDataE"), 1)
 
 if __name__ == "__main__":
     unittest.main()

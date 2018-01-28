@@ -27,11 +27,10 @@ int main(int argc, char *argv[]) {
 
     functionA();
 
-    {
-      FilterCoverageScope scope;
-      functionB();
-      functionC();
-    }
+    FilterCoverage::beginFilteringCoverage();
+    functionB();
+    functionC();
+    FilterCoverage::endFilteringCoverage();
 
     functionD();
 
