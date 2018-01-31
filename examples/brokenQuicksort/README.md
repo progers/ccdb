@@ -15,7 +15,8 @@ path/to/llvm-profdata
 
 Then build the program with Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html):
 ```
-clang++ -g -fno-inline -fprofile-instr-generate -fcoverage-mapping brokenQuicksort.cpp -o brokenQuicksort
+cd examples/brokenQuicksort
+clang++ -g -fprofile-instr-generate -fcoverage-mapping brokenQuicksort.cpp -o brokenQuicksort
 ```
 
 
@@ -31,17 +32,17 @@ All you know is that there's a bug with certain input:
 ## Using code coverage debugging
 Begin by recording coverage for a working run of the program:
 ```
-python ../../record.py -o working.json ./brokenQuicksort 1 6 3 9 0
+python ../../record.py -o working.profraw ./brokenQuicksort 1 6 3 9 0
 ```
 
 Next, record coverage for a broken run of the program:
 ```
-python ../../record.py -o broken.json ./brokenQuicksort 1 6 5 9 0
+python ../../record.py -o broken.profraw ./brokenQuicksort 1 6 5 9 0
 ```
 
 Finally, compare the two recordings:
 ```
-python ../../compare.py working.json broken.json
+python ../../compare.py working.profraw broken.profraw
 
 swap(int*, int, int) call count difference: 3 != 4
 ```

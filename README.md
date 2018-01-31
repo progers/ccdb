@@ -17,30 +17,19 @@ Then, build the program with Clang's [source-based code coverage](https://clang.
 clang++ -g -fprofile-instr-generate -fcoverage-mapping program.cpp -o program
 ```
 
-Then record code coverage when running the program which will output a coverage file (`good.json`):
+Then record code coverage when running the program which will output a coverage file (`good.profraw`):
 ```
-python record.py -o good.json ./program good_args
+python record.py -o good.profraw ./program good_args
 ```
-
-The coverage file has a simple format where function call counts are recorded:
-```
-> python -m json.tool good.json
-{
-    "main": 1,
-    "functionA(...)": 1,
-    "functionB(...)": 3
-}
-```
-In this example, `main` and `functionA(...)` were called once, whereas `functionB(...)` was called 3 times.
 
 Now record code coverage again but on a run of the program that contains a bug:
 ```
-python record.py -o bug.json ./program bad_args
+python record.py -o bug.profraw ./program bad_args
 ```
 
 Finally, compare the two runs:
 ```
-python compare.py good.json bug.json
+python compare.py good.profraw bug.profraw
 
 functionB(...) call count difference: 3 != 0
 ```

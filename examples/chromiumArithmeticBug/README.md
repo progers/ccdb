@@ -58,13 +58,13 @@ ninja: error: unknown target 'does_not_exist'
 `record.py` can be used to record the call counts of all function calls. Use it to record runs for `bug.html` and `nobug.html`:
 ```
 > cd examples/chromiumArithmeticBug
-> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process bug.html -o bug.json
-> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process nobug.html -o nobug.json
+> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process bug.html -o bug.profraw
+> python ../../record.py ${CHROMIUM_SRC}/out/Coverage/content_shell --no-sandbox --disable-gpu --run-layout-test --single-process nobug.html -o nobug.profraw
 ```
 
 Then use `compare.py` to analyze the differences.
 ```
-> python ../../compare.py nobug.json bug.json | grep ^blink::Layout
+> python ../../compare.py nobug.profraw bug.profraw | grep ^blink::Layout
 
 blink::LayoutObject::NeedsSimplifiedNormalFlowLayout() const call count difference: 30 != 29
 blink::LayoutBlockFlow::MarginValues::SetNegativeMarginBefore(...) call count difference: 2 != 1

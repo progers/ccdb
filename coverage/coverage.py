@@ -1,10 +1,11 @@
 # coverage.py - code coverage
 #
-# A Coverage object has a map of functions and their call counts.
-# TODO(phil): Expand this to include the segments of each function.
+# A Coverage object has a map of functions and their call counts. This class
+# also has supporting functions for parsing raw LLVM code coverage profiles.
 
 from collections import defaultdict
 import json
+import re
 import subprocess
 
 class Coverage(object):
@@ -65,12 +66,50 @@ class Coverage(object):
             encoded["files"][file][function] = self._callcounts[(file, function)]
         return json.dumps(encoded, sort_keys=False, indent=indent)
 
+    # Parse the function counter output of llvm-profdata show and return a
+    # Coverage object.
     @staticmethod
-    def fromJson(string):
+    def _fromProfDataShowAllFunctions(profdata):
         coverage = Coverage()
-        decoded = json.loads(string)
-        files = decoded["files"]
-        for file in files:
-            for function in files[file]:
-                coverage.addCallCount(file, function, files[file][function])
+        # The format is roughly:
+        #   optional_filename.cpp:function_name:
+        #     Hash: 0x456
+        #     Counters: 6
+        #     Function count: 3
+        # TODO(phil): Support block or region counters instead of just function-level counters.
+        functionsRx = re.compile(r"^\s+(?P<fileAndFunction>.+):\n\s+Hash:\s.*\n\s+Counters:\s.*\n\s+Function\scount:\s(?P<count>.+)\n", re.MULTILINE)
+        for match in functionsRx.finditer(profdata):
+            count = int(match.group("count"))
+            if count == 0:
+                continue
+            fileAndFunction = match.group("fileAndFunction")
+            fileAndFunctionMatch = re.match(r"(?P<file>.+):(?P<function>.+)", fileAndFunction)
+            if fileAndFunctionMatch:
+                file = fileAndFunctionMatch.group("file")
+                function = fileAndFunctionMatch.group("function")
+                coverage.addCallCount(file, function, count)
+            else:
+                coverage.addCallCount("", fileAndFunction, count)
         return coverage
+
+    # Convert a raw LLVM profile coverage file into a Coverage object.
+    @staticmethod
+    def fromRawLlvmProfile(rawProfDataPath, llvmToolchainPath = None):
+        # Ensure llvm-profdata is available.
+        llvmProfdata = "llvm-profdata"
+        command = [ llvmProfdata, "show", "--help" ]
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, err = proc.communicate()
+        if err != "":
+            raise AssertionError(err)
+
+        # Use llvm-profdata to dump the raw counter values for each function.
+        # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-show
+        # TODO(phil): Support block or region counters instead of just function-level counters.
+        command = [ llvmProfdata, "show", "-all-functions", "-text", rawProfDataPath ]
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        out, err = proc.communicate()
+        if err != "":
+            raise AssertionError(err)
+
+        return Coverage._fromProfDataShowAllFunctions(out)

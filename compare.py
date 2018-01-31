@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-# compare.py - compare code coverage.
+# compare.py - Compare two raw code coverage files.
+# Usage: compare.py coverageA.profraw coverageB.profraw
 
 import argparse
-
-import record
 from coverage.coverage import Coverage
 
 def _fileAndFunction(file, function):
@@ -31,18 +30,31 @@ def compare(coverageA, coverageB):
             differences.append((callCountDifference, differenceString))
 
     sortedDifferences = sorted(differences, key=lambda tup: tup[0])
-    return [difference[1] for difference in sortedDifferences]
+    return [ difference[1] for difference in sortedDifferences ]
 
 def main():
     parser = argparse.ArgumentParser(description="Compare code coverage")
-    parser.add_argument("coverageA", help="Coverage file for run A")
-    parser.add_argument("coverageB", help="Coverage file for run B")
+    parser.add_argument("coverageA", help="Raw coverage file for run A")
+    parser.add_argument("coverageB", help="Raw coverage file for run B")
+    parser.add_argument("-d", "--demangler", help="Demangler")
     args = parser.parse_args()
 
-    with open (args.coverageA, 'r') as inFile:
-        coverageA = Coverage.fromJson(inFile.read())
-    with open (args.coverageB, 'r') as inFile:
-        coverageB = Coverage.fromJson(inFile.read())
+    coverageA = Coverage.fromRawLlvmProfile(args.coverageA)
+    coverageB = Coverage.fromRawLlvmProfile(args.coverageB)
+
+    if args.demangler:
+        coverageA.demangle(args.demangler)
+        coverageB.demangle(args.demangler)
+    else:
+        # Try demangling using c++filt but fail silently.
+        # MacOS's c++filt version is older and strips underscores by default,
+        # which is different from the latest GNU C++filt. Work around this
+        # difference by forcing underscores to not be stripped using -n.
+        try:
+            coverageA.demangle("c++filt -n")
+            coverageB.demangle("c++filt -n")
+        except:
+            pass
 
     differences = compare(coverageA, coverageB)
     for difference in differences:
