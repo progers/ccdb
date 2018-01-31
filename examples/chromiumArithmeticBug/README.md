@@ -54,6 +54,17 @@ ninja: Entering directory `out/Coverage'
 ninja: error: unknown target 'does_not_exist'
 ```
 
+## (optional) Filter out non-layout coverage
+
+Chromium's multi-process architecture leads to non-determinism which makes coverage unstable in general. [FilterCoverage.h](../../FilterCoverage.h) can be used to narrow in on a stable area of code coverage. For layout code, this would be callsites under `void LocalFrameView::UpdateLayout()`. Import [FilterCoverage.h](../../FilterCoverage.h) in `LocalFrameView.cpp` (or just paste the contents of [FilterCoverage.h](../../FilterCoverage.h) at the top of `LocalFrameView.cpp`), then add a `FilterCoverage::Scope`:
+```
+void LocalFrameView::UpdateLayout() {
+  FilterCoverage::Scope scope;
+  ...
+}
+```
+Build `content_shell` with `ninja -C out/Coverage content_shell` and code coverage will be filtered to callsites under `LocalFrameView::UpdateLayout()`.
+
 ## Narrowing in on the bug
 `record.py` can be used to record the call counts of all function calls. Use it to record runs for `bug.html` and `nobug.html`:
 ```
