@@ -5,8 +5,6 @@ Finding a bug in Chromium (Blink) with code coverage
 
 This example walks through a real-world bug using code coverage debugging.
 
-*Due to [crbug.com/796290](https://crbug.com/796290), linking Chromium does not work on MacOS due to code size. Until [crbug.com/796290](https://crbug.com/796290) is fixed, this example only works on linux.*
-
 ## Build with coverage
 Special flags need to be passed to the compiler and linker to enable Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html). This can be done by editing the gn args:
 
