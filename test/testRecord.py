@@ -30,7 +30,7 @@ class TestRecord(unittest.TestCase):
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
-        coverage = record.record(executable, "1 6 3 9 0")
+        coverage = record.record(executable, "1 6 3 9 0".split(" "))
         self.assertEqual(len(coverage.functions()), 5)
         self.assertEqual(coverage.callCount("", "_Z4swapPiii"), 3)
         self.assertEqual(coverage.callCount("", "main"), 1)

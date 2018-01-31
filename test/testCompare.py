@@ -73,8 +73,8 @@ class TestCompare(unittest.TestCase):
     # Integration test using the broken quicksort example.
     def testBrokenQuicksortExample(self):
         executable = "examples/brokenQuicksort/brokenQuicksort"
-        workingCoverage = record.record(executable, "1 6 3 9 0")
-        brokenCoverage = record.record(executable, "1 6 5 9 0")
+        workingCoverage = record.record(executable, "1 6 3 9 0".split(" "))
+        brokenCoverage = record.record(executable, "1 6 5 9 0".split(" "))
 
         differences = compare.compare(workingCoverage, brokenCoverage)
         self.assertEqual(len(differences), 1)
