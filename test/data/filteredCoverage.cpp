@@ -1,7 +1,7 @@
 // A simple program for testing filtered code coverage output.
 //
-// This program has four function calls (A, B, C, D), but only B and C
-// should record code coverage.
+// This program makes seven function calls (A, B, C, D, E, F, and G), but only a
+// subset should record code coverage (B, C, E, and F).
 
 #include <stdio.h>
 #include "../../FilterCoverage.h"
@@ -22,6 +22,18 @@ void functionD() {
     fprintf(stdout, "D\n");
 }
 
+void functionE() {
+    fprintf(stdout, "E\n");
+}
+
+void functionF() {
+    fprintf(stdout, "F\n");
+}
+
+void functionG() {
+    fprintf(stdout, "G\n");
+}
+
 int main(int argc, char *argv[]) {
     fprintf(stdout, "main\n");
 
@@ -33,6 +45,13 @@ int main(int argc, char *argv[]) {
     FilterCoverage::endFilteringCoverage();
 
     functionD();
+
+    FilterCoverage::beginFilteringCoverage();
+    functionE();
+    functionF();
+    FilterCoverage::endFilteringCoverage();
+
+    functionG();
 
     return 0;
 }

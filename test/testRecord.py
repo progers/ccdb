@@ -65,6 +65,9 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(coverage.callCount("", "_Z9functionBv"), 1)
         self.assertEqual(coverage.callCount("", "_Z9functionCv"), 1)
         self.assertEqual(coverage.callCount("", "_Z9functionDv"), 0)
+        self.assertEqual(coverage.callCount("", "_Z9functionEv"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9functionFv"), 1)
+        self.assertEqual(coverage.callCount("", "_Z9functionGv"), 0)
 
 if __name__ == "__main__":
     unittest.main()
