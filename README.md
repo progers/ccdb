@@ -36,7 +36,7 @@ functionB(...) call count difference: 3 != 0
 
 The good input called `functionB(...)` but the bad input didn't, so there is likey a bug where `functionB(...)` is not getting called.
 
-For more information, a simple walkthrough of this technique on real code is described in [examples/brokenQuicksort/README.md](examples/brokenQuicksort/README.md).
+For more information, a simple walkthrough of this technique on real code is described in [examples/brokenQuicksort](examples/brokenQuicksort/README.md).
 
 
 ## Prerequisites
