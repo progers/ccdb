@@ -29,9 +29,6 @@ extern "C" uint64_t *__llvm_profile_end_counters(void);
 namespace FilterCoverage {
 
 // Return the path where coverage will be written.
-// TODO(phil): Should %m be specified to use merging so filtering can be run
-// several times? Using a simple filename, only the last filtered coverage
-// will be written.
 static std::basic_string<char> coverageProfileOutputFilename() {
   const char* profileFileEnv = std::getenv("LLVM_PROFILE_FILE");
   if (!profileFileEnv || !profileFileEnv[0])
