@@ -43,16 +43,20 @@ For more information, a simple walkthrough of this technique on real code is des
 
 `clang++` and `llvm-profdata` need to be available on the PATH.
 ```
-> which clang++
+> which clang++ && echo "Pass: clang++ was found" || echo "Fail: clang++ not found"
 path/to/clang++
+Pass: clang++ was found
 
-> which llvm-profdata
+> which llvm-profdata && echo "Pass: llvm-profdata was found" || echo "Fail: llvm-profdata not found"
 path/to/llvm-profdata
+Pass: llvm-profdata was found
 ```
 
-If these are not available on linux, release binaries can be downloaded from [llvm.org](http://releases.llvm.org/download.html) and added to the PATH with `PATH=$PATH:path/to/llvm/bin`.
+These commands should both print "Pass". If either prints "Fail", you will need to add the binary to your PATH.
 
-If these are not available on MacOS, they can be downloaded by installing the XCode command line tools. Then run the following command to put the toolchain binaries on the PATH:
+On linux, release binaries can be downloaded from [llvm.org](http://releases.llvm.org/download.html) and added to the PATH with `PATH=$PATH:path/to/llvm/bin`.
+
+On MacOS, these can be downloaded by installing the XCode command line tools. Then run the following command to put the toolchain binaries on the PATH:
 ```
 PATH=$PATH:`xcrun -f llvm-profdata | xargs dirname`
 ```

@@ -4,13 +4,15 @@ Find a brokenQuicksort bug with code coverage
 It took years to write the advanced brokenQuicksort program. Days before shipping, a bug was discovered and assigned to you, the new person. You don't know enough about this complex code to know where to start. This tutorial will use code coverage debugging to find the bug.
 
 ## Building
-Ensure `clang++` and `llvm-profdata` are available on the PATH. If they are not, see [Prerequisites](../../README.md#prerequisites).
+Ensure `clang++` and `llvm-profdata` are available on the PATH by running the following `which` commands. If either command prints "Fail", see [Prerequisites](../../README.md#prerequisites).
 ```
-> which clang++
+> which clang++ && echo "Pass: clang++ was found" || echo "Fail: clang++ not found"
 path/to/clang++
+Pass: clang++ was found
 
-> which llvm-profdata
+> which llvm-profdata && echo "Pass: llvm-profdata was found" || echo "Fail: llvm-profdata not found"
 path/to/llvm-profdata
+Pass: llvm-profdata was found
 ```
 
 Then build the program with Clang's [source-based code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html):

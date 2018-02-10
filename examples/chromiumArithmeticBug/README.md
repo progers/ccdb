@@ -37,11 +37,12 @@ PATH=$PATH:${CHROMIUM_SRC}/third_party/llvm-build/Release+Asserts/bin
 
 Ensure `llvm-profdata` is available on the PATH:
 ```
-> which llvm-profdata
-should print CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
+> which llvm-profdata && echo "Pass: llvm-profdata was found" || echo "Fail: llvm-profdata not found"
+CHROMIUM_SRC/third_party/llvm-build/Release+Asserts/bin/llvm-profdata
+Pass: llvm-profdata was found
 ```
 
-If `llvm-profdata` is not available, a version matching `clang++` can be downloaded. As part of [crbug.com/759794](https://crbug.com/759794), `llvm-profdata` will be downloaded automatically but, for now, this is manual.
+If `llvm-profdata` is not found, a version matching `clang++` can be downloaded. As part of [crbug.com/759794](https://crbug.com/759794), `llvm-profdata` will be downloaded automatically but, for now, this is manual.
 An existing tool, [`coverage.py`](https://cs.chromium.org/chromium/src/tools/code_coverage/coverage.py), downloads the correct version of `llvm-profdata` and can be abused into just downloading it. Running the following command will fail with an error but should result in `llvm-profdata` being downloaded:
 ```
 > cd $CHROMIUM_SRC
