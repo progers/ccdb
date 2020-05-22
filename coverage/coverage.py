@@ -71,7 +71,7 @@ class Coverage(object):
     @staticmethod
     def _fromProfDataShowAllFunctions(profdata):
         coverage = Coverage()
-        # The format is roughly:
+        # The default format (without -text) is roughly:
         #   optional_filename.cpp:function_name:
         #     Hash: 0x456
         #     Counters: 6
@@ -106,7 +106,7 @@ class Coverage(object):
         # Use llvm-profdata to dump the raw counter values for each function.
         # See: https://llvm.org/docs/CommandGuide/llvm-profdata.html#profdata-show
         # TODO(phil): Support block or region counters instead of just function-level counters.
-        command = [ llvmProfdata, "show", "-all-functions", "-text", rawProfDataPath ]
+        command = [ llvmProfdata, "show", "-all-functions", rawProfDataPath ]
         proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         out, err = proc.communicate()
         if err != "":
