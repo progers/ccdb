@@ -1,7 +1,7 @@
 Finding a bug in Chromium (Blink) with code coverage
 =========
 
-[crbug.com/604331](https://crbug.com/604331) is a bug where one input ([bug.html](bug.html)) crashes but a slight variation of the testcase ([nobug.html](nobug.html)) does not crash. This crash occurs during painting but the culprit is likely in layout code. Unfortunately, layout is [large and complex](https://cs.chromium.org/chromium/src/third_party/WebKit/Source/core/layout/) so tracking this bug down is like finding a needle in a haystack.
+[crbug.com/604331](https://crbug.com/604331) is a bug where one input ([bug.html](bug.html)) crashes but a slight variation of the testcase ([nobug.html](nobug.html)) does not crash. This crash occurs during painting but the culprit is likely in layout code. Unfortunately, layout is [large and complex](https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/layout/) so tracking this bug down is like finding a needle in a haystack.
 
 This example walks through a real-world bug using code coverage debugging.
 
@@ -89,7 +89,7 @@ blink::LayoutBlockFlow::AddIntrudingFloats(...) call count difference: 0 != 1
 Somehow `LayoutBlockFlow::AddIntrudingFloats()` is called for `bug.html` but not `nobug.html`.
 
 ## Fixing the bug
-Looking at [LayoutBlockFlow.cpp](https://cs.chromium.org/chromium/src/third_party/WebKit/Source/core/layout/LayoutBlockFlow.cpp), `AddIntrudingFloats` is only getting called when the bug is present.
+Looking at [layout_block_flow.cc](https://cs.chromium.org/chromium/src/third_party/blink/renderer/core/layout/layout_block_flow.cc), `AddIntrudingFloats` is only getting called when the bug is present.
 
 ```
 void LayoutBlockFlow::RebuildFloatsFromIntruding()
