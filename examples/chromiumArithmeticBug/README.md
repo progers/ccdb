@@ -15,7 +15,7 @@ gn args out/Coverage
 Use the following args:
 ```
 is_debug=true
-is_component_build=false
+is_component_build=true
 use_clang_coverage=true
 use_goma=true
 ```
