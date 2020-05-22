@@ -19,8 +19,8 @@ class TestCoverage(unittest.TestCase):
         self.assertEquals(coverage.callCount("", "fn2"), 2)
 
         # "fn1" already exists in file "".
-        # TODO(phil): Re-enable this test.
-        # self.assertRaises(ValueError, coverage.addCallCount, "", "fn1", 3)
+        coverage.addCallCount("", "fn1", 1)
+        self.assertEquals(coverage.callCount("", "fn1"), 2)
 
         # Add another "fn1" but with a different filename.
         coverage.addCallCount("file.cpp", "fn1", 3)
